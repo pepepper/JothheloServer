@@ -7,28 +7,28 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class JOthheloServer{
-
-	public static void main(String[] args) {
-		try {
-			ArrayList<Game> games=new ArrayList<Game>();
-			ArrayList<Acception> queue=new ArrayList<Acception>();
-			ServerSocket ss =new ServerSocket(45451);
+	
+	public static void main(String[] args){
+		try{
+			ArrayList<Game> games = new ArrayList<Game>();
+			ArrayList<Acception> queue = new ArrayList<Acception>();
+			ServerSocket ss = new ServerSocket(45451);
 			ss.setReuseAddress(true);
-			while(true) {
-				Socket sc=ss.accept();
-				Acception temp=new Acception(sc, games);
+			while(true){
+				Socket sc = ss.accept();
+				Acception temp = new Acception(sc, games);
 				temp.start();
 				queue.add(temp);
-				for(Acception server:queue) {
-					if(!server.isAlive())server=null;
+				for(Acception server : queue){
+					if(!server.isAlive()) server = null;
 				}
-				queue.removeAll(Collections.singleton(null)); 
+				queue.removeAll(Collections.singleton(null));
 			}
-		} catch (IOException e) {
+		}catch(IOException e){
 			e.printStackTrace();
 		}
-
+		
 	}
-
+	
 }
 
