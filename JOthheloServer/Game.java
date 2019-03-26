@@ -1,3 +1,5 @@
+package JOthheloServer;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -7,13 +9,15 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Game extends Thread {
-	String room, pass;
-	Socket host, guest;
-	BufferedReader hostreader, guestreader;
-	PrintWriter hostwriter, guestwriter;
-	int x, y, locked = 0, ended = 0;
+	private String room;
+	String	pass;
+	private Socket host, guest;
+	private BufferedReader hostreader, guestreader;
+	private PrintWriter hostwriter, guestwriter;
+	private int x, y;
+	int locked = 0, ended = 0;
 
-	public Game(Socket sock, String string, String string2) {
+	Game(Socket sock, String string, String string2) {
 		host = sock;
 		x = Integer.parseInt(string);
 		y = Integer.parseInt(string2);
@@ -28,22 +32,25 @@ public class Game extends Thread {
 		}
 	}
 
-	public void login(Socket sock, String string) {
+	private void ready() {
+			hostwriter.print("READY");
+			guestwriter.print("READY");
+			hostwriter.flush();
+			guestwriter.flush();
+	}
+
+	void login(Socket sock, String string) {
 		if (locked == 1 && pass.compareTo(string) == 0) {
 			guest = sock;
 			try {
 				guestreader = new BufferedReader(new InputStreamReader(guest.getInputStream()));
 				guestwriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(guest.getOutputStream())));
-				guestwriter.print("SUCCESS " + String.valueOf(x) + " " + String.valueOf(y));
+				guestwriter.print("SUCCESS " + x + " " + y);
 				guestwriter.flush();
-				hostwriter.print("READY");
-				guestwriter.print("READY");
-				hostwriter.flush();
-				guestwriter.flush();
+				ready();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			;
 		} else {
 			try {
 				sock.close();
@@ -54,22 +61,18 @@ public class Game extends Thread {
 
 	}
 
-	public void login(Socket sock) {
+	void login(Socket sock) {
 		if (locked == 0) {
 			guest = sock;
 			try {
 				guestreader = new BufferedReader(new InputStreamReader(guest.getInputStream()));
 				guestwriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(guest.getOutputStream())));
-				guestwriter.print("SUCCESS " + String.valueOf(x) + " " + String.valueOf(y));
+				guestwriter.print("SUCCESS " + x + " " + y);
 				guestwriter.flush();
-				hostwriter.print("READY");
-				guestwriter.print("READY");
-				hostwriter.flush();
-				guestwriter.flush();
+				ready();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			;
 		} else {
 			try {
 				sock.close();
@@ -93,14 +96,15 @@ public class Game extends Thread {
 					hostwriter.flush();
 					continue;
 				} else if (request.contains("CLOSED")) {
-					guestwriter.print("CLOSED");
+					guestwriter.print(request);
 					guestwriter.flush();
 					ended = 1;
 					return;
 				} else {
 					guestwriter.print(request);
 					guestwriter.flush();
-					hostwriter.print("SUCCESS");
+					request = guestreader.readLine();
+					hostwriter.print(request);
 					hostwriter.flush();
 				}
 			} catch (IOException e) {
@@ -112,13 +116,16 @@ public class Game extends Thread {
 				request = guestreader.readLine();
 
 				if (request.contains("CLOSED")) {
-					hostwriter.print("CLOSED");
+					hostwriter.print(request);
 					hostwriter.flush();
 					ended = 1;
 					return;
 				} else {
 					hostwriter.print(request);
 					hostwriter.flush();
+					request = hostreader.readLine();
+					guestwriter.print(request);
+					guestwriter.flush();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();

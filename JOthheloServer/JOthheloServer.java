@@ -1,3 +1,5 @@
+package JOthheloServer;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -18,7 +20,7 @@ public class JOthheloServer{
 				temp.start();
 				queue.add(temp);
 				for(Acception server:queue) {
-					if(server.isAlive()==false)server=null;
+					if(!server.isAlive())server=null;
 				}
 				queue.removeAll(Collections.singleton(null)); 
 			}

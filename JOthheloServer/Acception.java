@@ -1,3 +1,5 @@
+package JOthheloServer;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -5,10 +7,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class Acception extends Thread {
-	Socket sock;
-	ArrayList<Game> game;
+	private Socket sock;
+	private ArrayList<Game> game;
 
-	public Acception(Socket sc, ArrayList<Game> g) {
+	Acception(Socket sc, ArrayList<Game> g) {
 		sock = sc;
 		game = g;
 	}
@@ -33,7 +35,6 @@ public class Acception extends Thread {
 					}
 				}
 			}
-			return;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
